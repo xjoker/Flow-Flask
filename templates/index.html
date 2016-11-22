@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flow</title>
+</head>
+<body>
+
+<h3>最后更新时间：<small>{{lastRepoTime}} UTC</small></h3>
+<div style="width: 400px;display: inline-block">
+    <h4>本月流量</h4>
+    <table>
+        <th>
+            <tr>
+                <td>端口</td>
+                <td>当月流量</td>
+                <td>当前费用</td>
+            </tr>
+        </th>
+        {% if nowMonthFlow %}
+            {% for port in nowMonthFlow %}
+                <tr>
+                    <td>{{ port[0] }}</td>
+                    <td>{{ port[1] }} MB</td>
+                    <td>￥{{ port[2] }} </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>
+<div style="width: 400px;display: inline-block">
+        <h4>上月流量</h4>
+    <table>
+        <th>
+            <tr>
+                <td>端口</td>
+                <td>当月流量</td>
+                <td>当前费用</td>
+            </tr>
+        </th>
+        {% if lastMonthFlow %}
+            {% for port in lastMonthFlow %}
+                <tr>
+                    <td>{{ port[0] }}</td>
+                    <td>{{ port[1] }} MB</td>
+                    <td>￥{{ port[2] }} </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>
+
+
+</body>
+</html>
