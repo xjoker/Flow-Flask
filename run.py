@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 traffic = Traffice()
 # 主机IP
+traffic.host_ip = '127.0.0.1'
 
 
 def timestamp_datetime(value):
