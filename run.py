@@ -9,7 +9,6 @@ app = Flask(__name__)
 
 traffic = Traffice()
 # 主机IP
-traffic.host_ip = '10.140.0.3'
 
 
 def timestamp_datetime(value):
@@ -40,11 +39,14 @@ def hello_world():
     nowStartTime=datetime_timestamp("{0}-{1}-1 00:00:00".format(int(today.year),int(today.month)))
     nowStopTime=datetime_timestamp("{0}-{1}-{2} 23:59:59".format(int(today.year),int(today.month),int(last_day_num)))
 
-    nMonth=traffic.dbConn.execute("SELECT port, logDate,sum(flow) from FlowLog WHERE logDate>{0} and logDate<{1}".format(nowStartTime,nowStopTime))
+    portList=traffic.dbConn.execute("SELECT distinct  port from FlowLog;")
 
-    for i in nMonth:
-        tr=round((i[2] / 1024 / 1024), 2)
-        nowMonthFlow.append([i[0],tr,(tr/1024)*1+8]);
+    for i in portList:
+        nMonth = traffic.dbConn.execute(
+            "SELECT port, logDate,sum(flow) from FlowLog WHERE logDate>{0} and logDate<{1} and port={2}".format(nowStartTime,nowStopTime,i[0]))
+        for b in nMonth:
+            tr=round((b[2] / 1024 / 1024), 2)
+            nowMonthFlow.append([b[0],tr,(tr/1024)*1+8]);
 
 
     # 上月计算
@@ -53,17 +55,17 @@ def hello_world():
     lastStartTime = datetime_timestamp("{0}-{1}-1 00:00:00".format(int(lastMonth.year), int(lastMonth.month)))
     lastStopTime = datetime_timestamp("{0}-{1}-{2} 23:59:59".format(int(lastMonth.year), int(lastMonth.month), int(lastMonth.day)))
 
-    lMonth = traffic.dbConn.execute(
-        "SELECT port, logDate,sum(flow) from FlowLog WHERE logDate>{0} and logDate<{1}".format(lastStartTime,
-                                                                                               lastStopTime))
-    for i in lMonth:
-        if i[0]:
-            tr = round((i[2] / 1024 / 1024), 2)
-            lastMonthFlow.append([i[0], tr, (tr / 1024) * 1 + 8]);
+    for i in portList:
+        lMonth = traffic.dbConn.execute(
+            "SELECT port, logDate,sum(flow) from FlowLog WHERE logDate>{0} and logDate<{1} and port={2}".format(lastStartTime,lastStopTime,i[0]))
+        if lMonth[0]:
+            for b in lMonth:
+                tr = round((b[2] / 1024 / 1024), 2)
+                lastMonthFlow.append([b[0], tr, (tr / 1024) * 1 + 8]);
 
 
     return render_template('index.html',nowMonthFlow=nowMonthFlow,lastMonthFlow=lastMonthFlow,lastRepoTime=lastRepoTime)
 
 if __name__ == '__main__':
     traffic.threadRun()
-    app.run(host='0.0.0.0',port=80,debug=False)
+    app.run(host='0.0.0.0',port=5000,debug=False)
